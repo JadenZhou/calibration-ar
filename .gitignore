@@ -1,0 +1,16 @@
+# config
+.clang-format
+.vscode
+
+# directories
+bin/
+data/
+out/
+models/
+build/
+
+# executables
+**.o
+
+compile_commands.json
+readme.txt
