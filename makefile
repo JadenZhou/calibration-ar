@@ -34,10 +34,19 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | dirs
 COMMON_OBJS = $(OBJDIR)/checkerboard.o
 
 # Calibration
-CALIB_OBJS = $(OBJDIR)/calibration.o $(OBJDIR)/calibration_utils.o $(OBJDIR)/intrinsics.o $(OBJDIR)/image_io.o $(COMMON_OBJS)
+CALIB_OBJS = \
+	$(OBJDIR)/calibration.o \
+	$(OBJDIR)/calibration_utils.o \
+	$(OBJDIR)/intrinsics.o \
+	$(OBJDIR)/image_io.o \
+	$(COMMON_OBJS)
 
 # Pose + AR
-POSE_OBJS = $(OBJDIR)/pose.o $(COMMON_OBJS)
+POSE_OBJS = \
+	$(OBJDIR)/pose.o \
+	$(OBJDIR)/pose_utils.o \
+	$(OBJDIR)/calibration_utils.o \
+	$(COMMON_OBJS)
 
 # Feature detection
 FEAT_OBJS = $(OBJDIR)/features.o
