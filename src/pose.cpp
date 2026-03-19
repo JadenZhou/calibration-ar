@@ -1,0 +1,103 @@
+/**
+ * pose.cpp
+ * Name: Jaden Zhou
+ * Date: Mar 2026
+ * Purpose: Task 4 - Live checkerboard pose estimation using solvePnP.
+ */
+
+#include <opencv2/opencv.hpp>
+
+#include <cstdio>
+#include <iostream>
+#include <vector>
+
+#include "calibration.h"
+#include "checkerboard.h"
+#include "pose.h"
+
+static void printPose(const cv::Mat &rvec, const cv::Mat &tvec) {
+  std::cout << "rvec: [" << rvec.at<double>(0, 0) << ", "
+            << rvec.at<double>(1, 0) << ", " << rvec.at<double>(2, 0) << "]   ";
+
+  std::cout << "tvec: [" << tvec.at<double>(0, 0) << ", "
+            << tvec.at<double>(1, 0) << ", " << tvec.at<double>(2, 0) << "]\n";
+}
+
+int main() {
+  cv::Mat cameraMatrix, distCoeffs;
+  int rc = readIntrinsics("data/calibration.yml", cameraMatrix, distCoeffs);
+
+  if (rc != 0) {
+    std::cerr << "Error: failed to load intrinsics\n";
+    return -1;
+  }
+
+  std::cout << "Loaded camera matrix:\n" << cameraMatrix << "\n";
+  std::cout << "Loaded distortion coefficients:\n" << distCoeffs << "\n";
+
+  cv::VideoCapture cap(0);
+  if (!cap.isOpened()) {
+    std::cerr << "Error: could not open camera\n";
+    return -1;
+  }
+
+  cv::Size patternSize(9, 6);
+  std::vector<cv::Vec3f> point_set = buildPointSet(patternSize);
+
+  cv::Mat frame;
+  std::vector<cv::Point2f> corners;
+  cv::Mat rvec, tvec;
+
+  while (true) {
+    cap >> frame;
+    if (frame.empty()) {
+      std::cerr << "Error: empty frame\n";
+      break;
+    }
+
+    bool found = detectCheckerboard(frame, patternSize, corners);
+
+    if (found) {
+      drawCorners(frame, patternSize, corners, found);
+
+      rc = estimatePose(point_set, corners, cameraMatrix, distCoeffs, rvec,
+                        tvec);
+
+      if (rc == 0) {
+        printPose(rvec, tvec);
+
+        cv::putText(frame, "Pose found", cv::Point(20, 30),
+                    cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 255, 0), 2);
+
+        char pose_buf[256];
+        std::snprintf(pose_buf, sizeof(pose_buf), "tvec: [%.2f, %.2f, %.2f]",
+                      tvec.at<double>(0, 0), tvec.at<double>(1, 0),
+                      tvec.at<double>(2, 0));
+
+        cv::putText(frame, pose_buf, cv::Point(20, 65),
+                    cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(255, 255, 0), 2);
+      } else {
+        cv::putText(frame, "solvePnP failed", cv::Point(20, 30),
+                    cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 0, 255), 2);
+      }
+
+    } else {
+      cv::putText(frame, "Checkerboard not found", cv::Point(20, 30),
+                  cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 0, 255), 2);
+    }
+
+    cv::putText(frame, "[q] quit", cv::Point(20, frame.rows - 20),
+                cv::FONT_HERSHEY_SIMPLEX, 0.55, cv::Scalar(255, 255, 255), 1);
+
+    cv::imshow("Pose Estimation", frame);
+
+    char key = (char)cv::waitKey(1);
+    if (key == 'q') {
+      break;
+    }
+  }
+
+  cap.release();
+  cv::destroyAllWindows();
+  return 0;
+}
