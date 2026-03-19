@@ -27,4 +27,19 @@
 int writeSavedImages(const std::string &dir,
                      const std::vector<cv::Mat> &image_list);
 
+/**
+ * saveScreenshot
+ * Saves a single image to disk with an incrementing filename.
+ *
+ * Arguments:
+ * - dir: output directory
+ * - prefix: filename prefix
+ * - frame: image to save
+ *
+ * Returns:
+ * - 0 on success, non-zero on error
+ */
+int saveImage(const std::string &dir, const std::string &prefix,
+              const cv::Mat &frame);
+
 #endif

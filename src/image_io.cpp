@@ -31,3 +31,25 @@ int writeSavedImages(const std::string &dir,
 
   return 0;
 }
+
+int saveImage(const std::string &dir, const std::string &prefix,
+              const cv::Mat &frame) {
+  static int img_idx = 0;
+
+  if (frame.empty()) {
+    std::cerr << "Error: cannot save empty image\n";
+    return -1;
+  }
+
+  std::ostringstream filename;
+  filename << dir << "/" << prefix << "_" << std::setw(3) << std::setfill('0')
+           << img_idx++ << ".png";
+
+  if (!cv::imwrite(filename.str(), frame)) {
+    std::cerr << "Error: failed to write " << filename.str() << "\n";
+    return -2;
+  }
+
+  std::cout << "Saved image: " << filename.str() << "\n";
+  return 0;
+}

@@ -13,6 +13,7 @@
 
 #include "calibration.h"
 #include "checkerboard.h"
+#include "image_io.h"
 #include "pose.h"
 
 static void printPose(const cv::Mat &rvec, const cv::Mat &tvec) {
@@ -94,14 +95,20 @@ int main() {
                   cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 0, 255), 2);
     }
 
-    cv::putText(frame, "[q] quit", cv::Point(20, frame.rows - 20),
-                cv::FONT_HERSHEY_SIMPLEX, 0.55, cv::Scalar(255, 255, 255), 1);
+    cv::putText(frame, "[p] save image  [q] quit",
+                cv::Point(20, frame.rows - 20), cv::FONT_HERSHEY_SIMPLEX, 0.55,
+                cv::Scalar(255, 255, 255), 1);
 
     cv::imshow("Pose Estimation + Axes", frame);
 
     char key = (char)cv::waitKey(1);
     if (key == 'q') {
       break;
+    } else if (key == 'p') {
+      int save_rc = saveImage("out/images", "pose", frame);
+      if (save_rc != 0) {
+        std::cout << "Failed to save image\n";
+      }
     }
   }
 
