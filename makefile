@@ -46,6 +46,7 @@ POSE_OBJS = \
 	$(OBJDIR)/pose.o \
 	$(OBJDIR)/pose_utils.o \
 	$(OBJDIR)/calibration_utils.o \
+	$(OBJDIR)/image_io.o \
 	$(COMMON_OBJS)
 
 # Feature detection
