@@ -12,6 +12,7 @@
 
 #include "calibration.h"
 #include "checkerboard.h"
+#include "image_io.h"
 #include "intrinsics.h"
 
 int main() {
@@ -25,6 +26,7 @@ int main() {
   cv::Size patternSize(9, 6); // internal corners
 
   cv::Mat frame;
+  cv::Mat last_good_frame;
   std::vector<cv::Point2f> corners;
 
   std::vector<cv::Point2f> last_good_corners;
@@ -32,6 +34,7 @@ int main() {
 
   std::vector<std::vector<cv::Point2f>> corner_list;
   std::vector<std::vector<cv::Vec3f>> point_list;
+  std::vector<cv::Mat> image_list;
 
   cv::Mat cameraMatrix, distCoeffs;
   std::vector<cv::Mat> rvecs, tvecs;
@@ -51,6 +54,7 @@ int main() {
       drawCorners(frame, patternSize, corners, found);
 
       last_good_corners = corners;
+      last_good_frame = frame.clone();
       have_last_good = true;
 
       cv::putText(frame, "Checkerboard found", cv::Point(20, 30),
@@ -72,23 +76,32 @@ int main() {
                   0.8, cv::Scalar(255, 0, 255), 2);
     }
 
+    cv::putText(
+        frame,
+        "[s] save  [c] calibrate  [w] write yml  [i] write imgs  [q] quit",
+        cv::Point(20, frame.rows - 20), cv::FONT_HERSHEY_SIMPLEX, 0.55,
+        cv::Scalar(255, 255, 255), 1);
+
     cv::imshow("Calibration", frame);
 
     char key = (char)cv::waitKey(1);
 
     if (key == 'q') {
       break;
+
     } else if (key == 's') {
       if (!have_last_good) {
         std::cout << "No valid checkerboard detection to save\n";
         continue;
       }
 
-      int rc = saveCalibrationFrame(last_good_corners, patternSize, corner_list,
-                                    point_list);
+      int rc =
+          saveCalibrationFrame(last_good_frame, last_good_corners, patternSize,
+                               corner_list, point_list, image_list);
 
       if (rc == 0) {
         std::cout << "Saved calibration frame " << corner_list.size() << "\n";
+        std::cout << "Stored images: " << image_list.size() << "\n";
       } else {
         std::cout << "Failed to save calibration frame\n";
       }
@@ -119,6 +132,16 @@ int main() {
         std::cout << "Wrote calibration to data/calibration.yml\n";
       } else {
         std::cout << "Failed to write calibration file\n";
+      }
+
+    } else if (key == 'i') {
+      int rc = writeSavedImages("data/images", image_list);
+
+      if (rc == 0) {
+        std::cout << "Wrote " << image_list.size()
+                  << " images to data/images\n";
+      } else {
+        std::cout << "Failed to write saved images\n";
       }
     }
   }
