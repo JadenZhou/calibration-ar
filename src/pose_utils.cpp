@@ -54,3 +54,47 @@ int estimatePose(const std::vector<cv::Vec3f> &point_set,
 
   return 0;
 }
+
+int projectAxes(float axisLength, const cv::Mat &rvec, const cv::Mat &tvec,
+                const cv::Mat &cameraMatrix, const cv::Mat &distCoeffs,
+                std::vector<cv::Point2f> &imagePoints) {
+  std::vector<cv::Point3f> axisPoints;
+
+  // origin, +x, +y, +z
+  // z is negative so it comes "out" of the board toward the camera
+  axisPoints.push_back(cv::Point3f(0.0f, 0.0f, 0.0f));
+  axisPoints.push_back(cv::Point3f(axisLength, 0.0f, 0.0f));
+  axisPoints.push_back(cv::Point3f(0.0f, -axisLength, 0.0f));
+  axisPoints.push_back(cv::Point3f(0.0f, 0.0f, axisLength));
+
+  cv::projectPoints(axisPoints, rvec, tvec, cameraMatrix, distCoeffs,
+                    imagePoints);
+
+  if (imagePoints.size() != 4) {
+    std::cerr << "Error: expected 4 projected axis points, got "
+              << imagePoints.size() << "\n";
+    return -1;
+  }
+
+  return 0;
+}
+
+int drawAxes(cv::Mat &frame, const std::vector<cv::Point2f> &imagePoints) {
+  if (imagePoints.size() != 4) {
+    std::cerr << "Error: drawAxes requires 4 image points\n";
+    return -1;
+  }
+
+  const cv::Point origin = imagePoints[0];
+  const cv::Point xpt = imagePoints[1];
+  const cv::Point ypt = imagePoints[2];
+  const cv::Point zpt = imagePoints[3];
+
+  cv::line(frame, origin, xpt, cv::Scalar(0, 0, 255), 3); // X = red
+  cv::line(frame, origin, ypt, cv::Scalar(0, 255, 0), 3); // Y = green
+  cv::line(frame, origin, zpt, cv::Scalar(255, 0, 0), 3); // Z = blue
+
+  cv::circle(frame, origin, 5, cv::Scalar(255, 255, 255), -1);
+
+  return 0;
+}

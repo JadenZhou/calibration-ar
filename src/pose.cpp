@@ -2,7 +2,7 @@
  * pose.cpp
  * Name: Jaden Zhou
  * Date: Mar 2026
- * Purpose: Task 4 - Live checkerboard pose estimation using solvePnP.
+ * Purpose: Live checkerboard pose estimation and axis projection.
  */
 
 #include <opencv2/opencv.hpp>
@@ -47,6 +47,7 @@ int main() {
   cv::Mat frame;
   std::vector<cv::Point2f> corners;
   cv::Mat rvec, tvec;
+  std::vector<cv::Point2f> axisImagePoints;
 
   while (true) {
     cap >> frame;
@@ -65,6 +66,13 @@ int main() {
 
       if (rc == 0) {
         printPose(rvec, tvec);
+
+        rc = projectAxes(3.0f, rvec, tvec, cameraMatrix, distCoeffs,
+                         axisImagePoints);
+
+        if (rc == 0) {
+          drawAxes(frame, axisImagePoints);
+        }
 
         cv::putText(frame, "Pose found", cv::Point(20, 30),
                     cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 255, 0), 2);
@@ -89,7 +97,7 @@ int main() {
     cv::putText(frame, "[q] quit", cv::Point(20, frame.rows - 20),
                 cv::FONT_HERSHEY_SIMPLEX, 0.55, cv::Scalar(255, 255, 255), 1);
 
-    cv::imshow("Pose Estimation", frame);
+    cv::imshow("Pose Estimation + Axes", frame);
 
     char key = (char)cv::waitKey(1);
     if (key == 'q') {
