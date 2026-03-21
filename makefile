@@ -51,7 +51,10 @@ POSE_OBJS = \
 	$(COMMON_OBJS)
 
 # Feature detection
-FEAT_OBJS = $(OBJDIR)/features.o
+FEAT_OBJS = \
+	$(OBJDIR)/features.o \
+	$(OBJDIR)/features_utils.o \
+	$(OBJDIR)/image_io.o 
 
 # --- Executables ---
 
