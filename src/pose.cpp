@@ -2,7 +2,7 @@
  * pose.cpp
  * Name: Jaden Zhou
  * Date: Mar 2026
- * Purpose: Live checkerboard pose estimation and axis projection.
+ * Purpose: Live pose estimation, projected axes, and virtual object.
  */
 
 #include <opencv2/opencv.hpp>
@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 
+#include "ar_object.h"
 #include "calibration.h"
 #include "checkerboard.h"
 #include "image_io.h"
@@ -33,9 +34,6 @@ int main() {
     return -1;
   }
 
-  std::cout << "Loaded camera matrix:\n" << cameraMatrix << "\n";
-  std::cout << "Loaded distortion coefficients:\n" << distCoeffs << "\n";
-
   cv::VideoCapture cap(0);
   if (!cap.isOpened()) {
     std::cerr << "Error: could not open camera\n";
@@ -45,10 +43,17 @@ int main() {
   cv::Size patternSize(9, 6);
   std::vector<cv::Vec3f> point_set = buildPointSet(patternSize);
 
+  std::vector<cv::Point3f> housePoints = makeHousePoints();
+  std::vector<std::pair<int, int>> houseEdges = makeHouseEdges();
+
   cv::Mat frame;
   std::vector<cv::Point2f> corners;
   cv::Mat rvec, tvec;
   std::vector<cv::Point2f> axisImagePoints;
+  std::vector<cv::Point2f> objectImagePoints;
+
+  bool showAxes = true;
+  bool showObject = true;
 
   while (true) {
     cap >> frame;
@@ -68,11 +73,20 @@ int main() {
       if (rc == 0) {
         printPose(rvec, tvec);
 
-        rc = projectAxes(3.0f, rvec, tvec, cameraMatrix, distCoeffs,
-                         axisImagePoints);
+        if (showAxes) {
+          rc = projectAxes(3.0f, rvec, tvec, cameraMatrix, distCoeffs,
+                           axisImagePoints);
+          if (rc == 0) {
+            drawAxes(frame, axisImagePoints);
+          }
+        }
 
-        if (rc == 0) {
-          drawAxes(frame, axisImagePoints);
+        if (showObject) {
+          rc = projectObject(housePoints, rvec, tvec, cameraMatrix, distCoeffs,
+                             objectImagePoints);
+          if (rc == 0) {
+            drawObject(frame, objectImagePoints, houseEdges);
+          }
         }
 
         cv::putText(frame, "Pose found", cv::Point(20, 30),
@@ -89,23 +103,26 @@ int main() {
         cv::putText(frame, "solvePnP failed", cv::Point(20, 30),
                     cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 0, 255), 2);
       }
-
     } else {
       cv::putText(frame, "Checkerboard not found", cv::Point(20, 30),
                   cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 0, 255), 2);
     }
 
-    cv::putText(frame, "[p] save image  [q] quit",
+    cv::putText(frame, "[a] axes  [o] object  [p] screenshot  [q] quit",
                 cv::Point(20, frame.rows - 20), cv::FONT_HERSHEY_SIMPLEX, 0.55,
                 cv::Scalar(255, 255, 255), 1);
 
-    cv::imshow("Pose Estimation + Axes", frame);
+    cv::imshow("Pose + AR Object", frame);
 
     char key = (char)cv::waitKey(1);
     if (key == 'q') {
       break;
+    } else if (key == 'a') {
+      showAxes = !showAxes;
+    } else if (key == 'o') {
+      showObject = !showObject;
     } else if (key == 'p') {
-      int save_rc = saveImage("out/images", "pose", frame);
+      int save_rc = saveImage("out/images", "img", frame);
       if (save_rc != 0) {
         std::cout << "Failed to save image\n";
       }
