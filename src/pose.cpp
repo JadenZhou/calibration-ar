@@ -43,8 +43,8 @@ int main() {
   cv::Size patternSize(9, 6);
   std::vector<cv::Vec3f> point_set = buildPointSet(patternSize);
 
-  std::vector<cv::Point3f> housePoints = makeHousePoints();
-  std::vector<std::pair<int, int>> houseEdges = makeHouseEdges();
+  std::vector<cv::Point3f> bananaPoints = makeBananaPoints();
+  std::vector<std::pair<int, int>> bananaEdges = makeBananaEdges();
 
   cv::Mat frame;
   std::vector<cv::Point2f> corners;
@@ -82,10 +82,10 @@ int main() {
         }
 
         if (showObject) {
-          rc = projectObject(housePoints, rvec, tvec, cameraMatrix, distCoeffs,
+          rc = projectObject(bananaPoints, rvec, tvec, cameraMatrix, distCoeffs,
                              objectImagePoints);
           if (rc == 0) {
-            drawObject(frame, objectImagePoints, houseEdges);
+            drawObject(frame, objectImagePoints, bananaEdges);
           }
         }
 

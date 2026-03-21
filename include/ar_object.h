@@ -2,32 +2,33 @@
  * ar_object.h
  * Name: Jaden Zhou
  * Date: Mar 2026
- * Purpose: Virtual 3D object definitions and drawing utilities.
+ * Purpose: Virtual 3D banana object definitions and drawing utilities.
  */
 
 #ifndef AR_OBJECT_H
 #define AR_OBJECT_H
 
 #include <opencv2/opencv.hpp>
+#include <utility>
 #include <vector>
 
 /**
- * makeHousePoints
- * Builds a simple floating wireframe house in board coordinates.
+ * makeBananaPoints
+ * Builds a floating wireframe banana in board coordinates.
  *
  * Returns:
  * - vector of 3D points
  */
-std::vector<cv::Point3f> makeHousePoints();
+std::vector<cv::Point3f> makeBananaPoints();
 
 /**
- * makeHouseEdges
- * Builds edge list for the wireframe house.
+ * makeBananaEdges
+ * Builds edge list for the wireframe banana.
  *
  * Returns:
  * - vector of vertex index pairs
  */
-std::vector<std::pair<int, int>> makeHouseEdges();
+std::vector<std::pair<int, int>> makeBananaEdges();
 
 /**
  * projectObject
