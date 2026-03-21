@@ -122,7 +122,7 @@ int main() {
     } else if (key == 'o') {
       showObject = !showObject;
     } else if (key == 'p') {
-      int save_rc = saveImage("out/images", "img", frame);
+      int save_rc = saveImage("out/images", "pose", frame);
       if (save_rc != 0) {
         std::cout << "Failed to save image\n";
       }
