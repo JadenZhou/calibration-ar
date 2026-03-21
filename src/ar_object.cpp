@@ -19,14 +19,14 @@ std::vector<cv::Point3f> makeHousePoints() {
   pts.push_back(cv::Point3f(0.0f, -2.0f, 0.0f)); // 3
 
   // Top of walls, floating above board
-  pts.push_back(cv::Point3f(0.0f, 0.0f, -2.0f));  // 4
-  pts.push_back(cv::Point3f(2.0f, 0.0f, -2.0f));  // 5
-  pts.push_back(cv::Point3f(2.0f, -2.0f, -2.0f)); // 6
-  pts.push_back(cv::Point3f(0.0f, -2.0f, -2.0f)); // 7
+  pts.push_back(cv::Point3f(0.0f, 0.0f, 2.0f));  // 4
+  pts.push_back(cv::Point3f(2.0f, 0.0f, 2.0f));  // 5
+  pts.push_back(cv::Point3f(2.0f, -2.0f, 2.0f)); // 6
+  pts.push_back(cv::Point3f(0.0f, -2.0f, 2.0f)); // 7
 
   // Roof ridge
-  pts.push_back(cv::Point3f(1.0f, 0.0f, -3.0f));  // 8
-  pts.push_back(cv::Point3f(1.0f, -2.0f, -3.0f)); // 9
+  pts.push_back(cv::Point3f(1.0f, 0.0f, 3.0f));  // 8
+  pts.push_back(cv::Point3f(1.0f, -2.0f, 3.0f)); // 9
 
   return pts;
 }
