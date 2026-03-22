@@ -16,6 +16,7 @@
 #include "checkerboard.h"
 #include "image_io.h"
 #include "pose.h"
+#include "solid_object.h"
 
 static void printPose(const cv::Mat &rvec, const cv::Mat &tvec) {
   std::cout << "rvec: [" << rvec.at<double>(0, 0) << ", "
@@ -45,6 +46,11 @@ int main() {
 
   std::vector<cv::Point3f> bananaPoints = makeBananaPoints();
   std::vector<std::pair<int, int>> bananaEdges = makeBananaEdges();
+
+  std::vector<cv::Point3f> solidPoints = makeSolidHousePoints();
+  std::vector<std::vector<int>> solidFaces = makeSolidHouseFaces();
+  std::vector<cv::Point2f> solidImagePoints;
+  bool showSolid = true;
 
   cv::Mat frame;
   std::vector<cv::Point2f> corners;
@@ -89,6 +95,15 @@ int main() {
           }
         }
 
+        if (showSolid) {
+          rc = projectSolidObject(solidPoints, rvec, tvec, cameraMatrix,
+                                  distCoeffs, solidImagePoints);
+          if (rc == 0) {
+            drawSolidObject(frame, solidPoints, solidImagePoints, solidFaces,
+                            rvec, tvec);
+          }
+        }
+
         cv::putText(frame, "Pose found", cv::Point(20, 30),
                     cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 255, 0), 2);
 
@@ -108,7 +123,8 @@ int main() {
                   cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 0, 255), 2);
     }
 
-    cv::putText(frame, "[a] axes  [o] object  [p] screenshot  [q] quit",
+    cv::putText(frame,
+                "[a] axes  [o] wireframe  [f] solid  [p] screenshot  [q] quit",
                 cv::Point(20, frame.rows - 20), cv::FONT_HERSHEY_SIMPLEX, 0.55,
                 cv::Scalar(255, 255, 255), 1);
 
@@ -126,6 +142,8 @@ int main() {
       if (save_rc != 0) {
         std::cout << "Failed to save image\n";
       }
+    } else if (key == 'f') {
+      showSolid = !showSolid;
     }
   }
 
