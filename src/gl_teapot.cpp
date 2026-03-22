@@ -483,6 +483,11 @@ static void evalPatch(const int patch[16], float u, float v, Vec3 &pos,
 }
 
 void renderTeapotGL(float size, int gridN) {
+  // Fix 1: render both sides — classic teapot patches have inconsistent
+  //         winding, so back-face culling punches holes
+  glDisable(GL_CULL_FACE);
+  glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
   float invN = 1.0f / (float)gridN;
 
   // Pre-allocate grid of positions and normals for one patch
@@ -516,4 +521,8 @@ void renderTeapotGL(float size, int gridN) {
       glEnd();
     }
   }
+
+  // Restore state
+  glEnable(GL_CULL_FACE);
+  glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
 }

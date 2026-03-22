@@ -144,7 +144,7 @@ static void renderTeapot() {
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
   glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shin);
 
-  renderTeapotGL(1.0f, 10);
+  renderTeapotGL(1.0f, 16);
 
   // Reset specular
   GLfloat nospec[] = {0.0f, 0.0f, 0.0f, 1.0f};
