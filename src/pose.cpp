@@ -117,6 +117,7 @@ int main() {
 
   bool showAxes = true;
   bool showWireframe = true;
+  SolidType currentSolid = SolidType::HOUSE;
   bool showSolid = true;
 
   std::vector<cv::Point2f> corners;
@@ -148,6 +149,11 @@ int main() {
     if (keyPressed['F'] || keyPressed['f']) {
       showSolid = !showSolid;
       keyPressed['F'] = keyPressed['f'] = false;
+    }
+    if (keyPressed['R'] || keyPressed['r']) {
+      currentSolid = nextSolidType(currentSolid);
+      std::cout << "Switched solid to " << solidTypeName(currentSolid) << "\n";
+      keyPressed['R'] = keyPressed['r'] = false;
     }
     if (keyPressed['P'] || keyPressed['p']) {
       cv::Mat screenshot = readFramebuffer(W, H);
@@ -183,8 +189,10 @@ int main() {
       cv::putText(frame, buf, cv::Point(20, 65), cv::FONT_HERSHEY_SIMPLEX, 0.7,
                   cv::Scalar(255, 255, 0), 2);
 
-      std::snprintf(buf, sizeof(buf), "Wireframe: %s  |  Solid: GL-shaded",
-                    objectTypeName(currentObject));
+      std::snprintf(buf, sizeof(buf), "Wire: %s | Solid: %s",
+                    objectTypeName(currentObject), solidTypeName(currentSolid));
+      cv::putText(frame, buf, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 0.7,
+                  cv::Scalar(255, 200, 0), 2);
       cv::putText(frame, buf, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 0.7,
                   cv::Scalar(255, 200, 0), 2);
     } else {
@@ -194,8 +202,9 @@ int main() {
     }
 
     cv::putText(frame,
-                "[a] axes [w] wire [e] next [f] solid [p] screenshot [q] quit",
-                cv::Point(20, frame.rows - 20), cv::FONT_HERSHEY_SIMPLEX, 0.5,
+                "[a] axes [w] wire [e] next wire [f] solid [r] next solid "
+                "[p] screenshot [q] quit",
+                cv::Point(20, frame.rows - 20), cv::FONT_HERSHEY_SIMPLEX, 0.45,
                 cv::Scalar(255, 255, 255), 1);
 
     // If pose is good, also draw wireframe + axes with OpenCV
@@ -238,37 +247,7 @@ int main() {
       setupLighting();
 
       // --- Solid house (your existing object) ---
-      renderSolidHouseGL();
-
-      // --- Utah teapot ---
-      // Position it on the board: translate to board coords, then scale.
-      // The raw teapot is ~3 units tall centered around z≈1.5,
-      // so we shift and scale to sit nicely on the board.
-      glPushMatrix();
-
-      // Move to a spot on the board (in checkerboard square units)
-      // x=5, y=-3 puts it roughly centered on the board
-      // z=0 is the board surface
-      glTranslatef(5.0f, -3.0f, 0.0f);
-
-      // Scale: raw teapot is ~3 units across, scale down to fit
-      float teapotScale = 0.5f;
-      glScalef(teapotScale, teapotScale, teapotScale);
-
-      // The teapot data has Z as up, which matches our board coords.
-      // Rotate 90° around X to orient the spout outward if desired:
-      // glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);  // uncomment to reorient
-
-      // Set teapot color: warm terracotta
-      glColor3f(0.82f, 0.41f, 0.12f);
-
-      // Specular highlight for the glazed ceramic look
-      GLfloat spec[] = {0.9f, 0.9f, 0.9f, 1.0f};
-      GLfloat shin[] = {60.0f};
-      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
-      glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shin);
-
-      renderTeapotGL(1.0f, 10);
+      renderSolidGL(currentSolid);
 
       // Reset specular so it doesn't bleed into other objects
       GLfloat nospec[] = {0.0f, 0.0f, 0.0f, 1.0f};
