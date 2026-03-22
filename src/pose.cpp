@@ -18,13 +18,15 @@
 #include "pose.h"
 #include "solid_object.h"
 
-static void printPose(const cv::Mat &rvec, const cv::Mat &tvec) {
-  std::cout << "rvec: [" << rvec.at<double>(0, 0) << ", "
-            << rvec.at<double>(1, 0) << ", " << rvec.at<double>(2, 0) << "]   ";
+// static void printPose(const cv::Mat &rvec, const cv::Mat &tvec) {
+//   std::cout << "rvec: [" << rvec.at<double>(0, 0) << ", "
+//             << rvec.at<double>(1, 0) << ", " << rvec.at<double>(2, 0) << "]
+//             ";
 
-  std::cout << "tvec: [" << tvec.at<double>(0, 0) << ", "
-            << tvec.at<double>(1, 0) << ", " << tvec.at<double>(2, 0) << "]\n";
-}
+//   std::cout << "tvec: [" << tvec.at<double>(0, 0) << ", "
+//             << tvec.at<double>(1, 0) << ", " << tvec.at<double>(2, 0) <<
+//             "]\n";
+// }
 
 static ObjectType nextObjectType(ObjectType type) {
   switch (type) {
@@ -101,7 +103,7 @@ int main() {
                         tvec);
 
       if (rc == 0) {
-        printPose(rvec, tvec);
+        // printPose(rvec, tvec);
 
         char obj_buf[128];
         std::snprintf(obj_buf, sizeof(obj_buf), "Wireframe: %s",
