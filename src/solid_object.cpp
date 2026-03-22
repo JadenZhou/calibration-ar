@@ -15,13 +15,22 @@
  * Builds a simple 3D house in world coordinates.
  */
 std::vector<cv::Point3f> makeSolidHousePoints() {
-  return {{0.0f, 0.0f, 0.0f},   {2.0f, 0.0f, 0.0f},
-          {2.0f, -2.0f, 0.0f},  {0.0f, -2.0f, 0.0f},
 
-          {0.0f, 0.0f, -2.0f},  {2.0f, 0.0f, -2.0f},
-          {2.0f, -2.0f, -2.0f}, {0.0f, -2.0f, -2.0f},
+  const float s = 2.0f;
+  const float cz = 2.0f;
 
-          {1.0f, 0.0f, -3.0f},  {1.0f, -2.0f, -3.0f}};
+  return {{s * 0.0f, s * 0.0f, cz + s * 0.0f},
+          {s * 2.0f, s * 0.0f, cz + s * 0.0f},
+          {s * 2.0f, s * -2.0f, cz + s * 0.0f},
+          {s * 0.0f, s * -2.0f, cz + s * 0.0f},
+
+          {s * 0.0f, s * 0.0f, cz + s * 2.0f},
+          {s * 2.0f, s * 0.0f, cz + s * 2.0f},
+          {s * 2.0f, s * -2.0f, cz + s * 2.0f},
+          {s * 0.0f, s * -2.0f, cz + s * 2.0f},
+
+          {s * 1.0f, s * 0.0f, cz + s * 3.0f},
+          {s * 1.0f, s * -2.0f, cz + s * 3.0f}};
 }
 
 /**
