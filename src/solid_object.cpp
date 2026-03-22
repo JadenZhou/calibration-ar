@@ -7,6 +7,7 @@
 
 #include "solid_object.h"
 
+#include <GL/glew.h>
 #include <algorithm>
 #include <iostream>
 
@@ -142,4 +143,73 @@ int drawSolidObject(cv::Mat &frame,
   }
 
   return 0;
+}
+
+cv::Point3f computeFaceNormal(const std::vector<cv::Point3f> &pts,
+                              const std::vector<int> &face) {
+  // Use first three vertices of the face
+  cv::Point3f a = pts[face[0]];
+  cv::Point3f b = pts[face[1]];
+  cv::Point3f c = pts[face[2]];
+
+  cv::Point3f u = b - a;
+  cv::Point3f v = c - a;
+
+  cv::Point3f n(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z,
+                u.x * v.y - u.y * v.x);
+
+  float len = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+  if (len > 1e-6f) {
+    n.x /= len;
+    n.y /= len;
+    n.z /= len;
+  }
+
+  return n;
+}
+
+void renderSolidHouseGL() {
+  auto pts = makeSolidHousePoints();
+  auto faces = makeSolidHouseFaces();
+
+  // Face colors: same palette as your OpenCV version but as 0-1 floats (RGB)
+  // Original palette is BGR in OpenCV, convert to RGB floats
+  float colors[][3] = {
+      {0.706f, 0.706f, 0.706f}, // gray         walls
+      {1.000f, 0.667f, 0.314f}, // orange
+      {0.471f, 0.863f, 0.314f}, // green
+      {0.314f, 0.667f, 1.000f}, // blue-orange
+      {0.863f, 0.471f, 0.863f}, // pink
+      {0.863f, 0.314f, 0.314f}, // red           roof sides
+      {0.784f, 0.314f, 0.314f}, {1.000f, 0.471f, 0.471f}, // roof panels
+      {0.922f, 0.471f, 0.471f},
+  };
+
+  for (size_t i = 0; i < faces.size(); i++) {
+    cv::Point3f n = computeFaceNormal(pts, faces[i]);
+
+    glColor3fv(colors[i % 9]);
+    glNormal3f(n.x, n.y, n.z);
+
+    glBegin(GL_POLYGON);
+    for (int idx : faces[i]) {
+      glVertex3f(pts[idx].x, pts[idx].y, pts[idx].z);
+    }
+    glEnd();
+  }
+
+  // Draw black wireframe edges on top for definition
+  glDisable(GL_LIGHTING);
+  glColor3f(0.0f, 0.0f, 0.0f);
+  glLineWidth(2.0f);
+
+  for (const auto &face : faces) {
+    glBegin(GL_LINE_LOOP);
+    for (int idx : face) {
+      glVertex3f(pts[idx].x, pts[idx].y, pts[idx].z);
+    }
+    glEnd();
+  }
+
+  glEnable(GL_LIGHTING);
 }

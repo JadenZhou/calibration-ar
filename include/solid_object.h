@@ -71,4 +71,25 @@ int drawSolidObject(cv::Mat &frame,
                     const std::vector<std::vector<int>> &faces,
                     const cv::Mat &rvec, const cv::Mat &tvec);
 
+/**
+ * computeFaceNormal
+ * Computes the outward-facing normal for a polygon face.
+ *
+ * Arguments:
+ * - pts: all object vertices
+ * - face: vertex indices defining the face
+ *
+ * Returns:
+ * - unit normal vector
+ */
+cv::Point3f computeFaceNormal(const std::vector<cv::Point3f> &pts,
+                              const std::vector<int> &face);
+
+/**
+ * renderSolidHouseGL
+ * Renders the solid house using OpenGL with lighting and filled polygons.
+ * Call this after setting GL projection and modelview matrices.
+ */
+void renderSolidHouseGL();
+
 #endif
