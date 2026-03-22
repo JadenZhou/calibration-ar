@@ -46,6 +46,9 @@ $(OBJDIR)/pose.o: $(SRCDIR)/pose.cpp | dirs
 $(OBJDIR)/solid_object.o: $(SRCDIR)/solid_object.cpp | dirs
 	$(CXX) $(CXXFLAGS_GL) -c $< -o $@
 
+$(OBJDIR)/gl_teapot.o: $(SRCDIR)/gl_teapot.cpp | dirs
+	$(CXX) $(CXXFLAGS_GL) -c $< -o $@
+
 # --- Object files ---
 
 # Shared
@@ -68,6 +71,7 @@ POSE_OBJS = \
 	$(OBJDIR)/ar_object.o \
 	$(OBJDIR)/solid_object.o \
 	$(OBJDIR)/gl_renderer.o \
+	$(OBJDIR)/gl_teapot.o \
 	$(COMMON_OBJS)
 
 # Feature detection

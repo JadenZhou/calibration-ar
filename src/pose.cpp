@@ -18,6 +18,7 @@
 #include "calibration.h"
 #include "checkerboard.h"
 #include "gl_renderer.h"
+#include "gl_teapot.h"
 #include "image_io.h"
 #include "pose.h"
 #include "solid_object.h"
@@ -235,7 +236,46 @@ int main() {
       glLoadMatrixd(mv);
 
       setupLighting();
+
+      // --- Solid house (your existing object) ---
       renderSolidHouseGL();
+
+      // --- Utah teapot ---
+      // Position it on the board: translate to board coords, then scale.
+      // The raw teapot is ~3 units tall centered around z≈1.5,
+      // so we shift and scale to sit nicely on the board.
+      glPushMatrix();
+
+      // Move to a spot on the board (in checkerboard square units)
+      // x=5, y=-3 puts it roughly centered on the board
+      // z=0 is the board surface
+      glTranslatef(5.0f, -3.0f, 0.0f);
+
+      // Scale: raw teapot is ~3 units across, scale down to fit
+      float teapotScale = 0.5f;
+      glScalef(teapotScale, teapotScale, teapotScale);
+
+      // The teapot data has Z as up, which matches our board coords.
+      // Rotate 90° around X to orient the spout outward if desired:
+      // glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);  // uncomment to reorient
+
+      // Set teapot color: warm terracotta
+      glColor3f(0.82f, 0.41f, 0.12f);
+
+      // Specular highlight for the glazed ceramic look
+      GLfloat spec[] = {0.9f, 0.9f, 0.9f, 1.0f};
+      GLfloat shin[] = {60.0f};
+      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
+      glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shin);
+
+      renderTeapotGL(1.0f, 10);
+
+      // Reset specular so it doesn't bleed into other objects
+      GLfloat nospec[] = {0.0f, 0.0f, 0.0f, 1.0f};
+      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, nospec);
+
+      glPopMatrix();
+
       glDisable(GL_LIGHTING);
     }
 
