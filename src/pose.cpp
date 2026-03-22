@@ -26,6 +26,28 @@ static void printPose(const cv::Mat &rvec, const cv::Mat &tvec) {
             << tvec.at<double>(1, 0) << ", " << tvec.at<double>(2, 0) << "]\n";
 }
 
+static ObjectType nextObjectType(ObjectType type) {
+  switch (type) {
+  case ObjectType::BANANA:
+    return ObjectType::PANDA;
+  case ObjectType::PANDA:
+    return ObjectType::BANANA;
+  default:
+    return ObjectType::BANANA;
+  }
+}
+
+static const char *objectTypeName(ObjectType type) {
+  switch (type) {
+  case ObjectType::BANANA:
+    return "Banana";
+  case ObjectType::PANDA:
+    return "Panda";
+  default:
+    return "Unknown";
+  }
+}
+
 int main() {
   cv::Mat cameraMatrix, distCoeffs;
   int rc = readIntrinsics("data/calibration.yml", cameraMatrix, distCoeffs);
@@ -81,6 +103,13 @@ int main() {
       if (rc == 0) {
         printPose(rvec, tvec);
 
+        char obj_buf[128];
+        std::snprintf(obj_buf, sizeof(obj_buf), "Wireframe: %s",
+                      objectTypeName(currentObject));
+
+        cv::putText(frame, obj_buf, cv::Point(20, 100),
+                    cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(255, 200, 0), 2);
+
         if (showAxes) {
           rc = projectAxes(10.0f, rvec, tvec, cameraMatrix, distCoeffs,
                            axisImagePoints);
@@ -126,8 +155,9 @@ int main() {
     }
 
     cv::putText(frame,
-                "[a] axes  [o] wireframe  [f] solid  [p] screenshot  [q] quit",
-                cv::Point(20, frame.rows - 20), cv::FONT_HERSHEY_SIMPLEX, 0.55,
+                "[a] axes  [w] toggle wireframe  [e] next object  [f] solid  "
+                "[p] screenshot  [q] quit",
+                cv::Point(20, frame.rows - 20), cv::FONT_HERSHEY_SIMPLEX, 0.5,
                 cv::Scalar(255, 255, 255), 1);
 
     cv::imshow("Pose + AR Object", frame);
@@ -137,8 +167,15 @@ int main() {
       break;
     } else if (key == 'a') {
       showAxes = !showAxes;
-    } else if (key == 'o') {
+    } else if (key == 'w') {
       showObject = !showObject;
+    } else if (key == 'e') {
+      currentObject = nextObjectType(currentObject);
+      objectPoints = makePoints(currentObject);
+      objectEdges = makeEdges(currentObject);
+
+      std::cout << "Switched wireframe object to "
+                << objectTypeName(currentObject) << "\n";
     } else if (key == 'p') {
       int save_rc = saveImage("out/images", "pose", frame);
       if (save_rc != 0) {
