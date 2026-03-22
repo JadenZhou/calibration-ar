@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-std::vector<cv::Point3f> makeBananaPoints() {
+static std::vector<cv::Point3f> makeBananaPoints() {
   std::vector<cv::Point3f> pts;
 
   const float s = 3.2f;
@@ -58,7 +58,7 @@ std::vector<cv::Point3f> makeBananaPoints() {
   return pts;
 }
 
-std::vector<std::pair<int, int>> makeBananaEdges() {
+static std::vector<std::pair<int, int>> makeBananaEdges() {
   std::vector<std::pair<int, int>> edges;
 
   // 6 cross-sections, 4 points each
@@ -96,6 +96,169 @@ std::vector<std::pair<int, int>> makeBananaEdges() {
   return edges;
 }
 
+/**
+ * makePandaPoints
+ * Builds a floating wireframe panda in world coordinates.
+ */
+static std::vector<cv::Point3f> makePandaPoints() {
+  std::vector<cv::Point3f> pts;
+
+  const float s = 1.2f;
+  const float cx = 4.0f;
+  const float cy = -2.5f;
+  const float cz = -2.0f;
+
+  // Head square: 0..3
+  pts.push_back(
+      cv::Point3f(cx + s * (-0.9f), cy + s * (1.6f), cz + s * (0.0f))); // 0
+  pts.push_back(
+      cv::Point3f(cx + s * (0.9f), cy + s * (1.6f), cz + s * (0.0f))); // 1
+  pts.push_back(
+      cv::Point3f(cx + s * (0.9f), cy + s * (0.0f), cz + s * (0.0f))); // 2
+  pts.push_back(
+      cv::Point3f(cx + s * (-0.9f), cy + s * (0.0f), cz + s * (0.0f))); // 3
+
+  // Ears: 4..7
+  pts.push_back(
+      cv::Point3f(cx + s * (-1.2f), cy + s * (2.1f), cz + s * (-0.1f))); // 4
+  pts.push_back(
+      cv::Point3f(cx + s * (-0.5f), cy + s * (2.4f), cz + s * (-0.2f))); // 5
+  pts.push_back(
+      cv::Point3f(cx + s * (0.5f), cy + s * (2.4f), cz + s * (-0.2f))); // 6
+  pts.push_back(
+      cv::Point3f(cx + s * (1.2f), cy + s * (2.1f), cz + s * (-0.1f))); // 7
+
+  // Body square: 8..11
+  pts.push_back(
+      cv::Point3f(cx + s * (-1.2f), cy + s * (-0.2f), cz + s * (0.0f))); // 8
+  pts.push_back(
+      cv::Point3f(cx + s * (1.2f), cy + s * (-0.2f), cz + s * (0.0f))); // 9
+  pts.push_back(
+      cv::Point3f(cx + s * (1.2f), cy + s * (-2.2f), cz + s * (0.0f))); // 10
+  pts.push_back(
+      cv::Point3f(cx + s * (-1.2f), cy + s * (-2.2f), cz + s * (0.0f))); // 11
+
+  // Arms: 12..15
+  pts.push_back(
+      cv::Point3f(cx + s * (-1.8f), cy + s * (-0.4f), cz + s * (0.1f))); // 12
+  pts.push_back(
+      cv::Point3f(cx + s * (-1.8f), cy + s * (-1.6f), cz + s * (0.1f))); // 13
+  pts.push_back(
+      cv::Point3f(cx + s * (1.8f), cy + s * (-0.4f), cz + s * (0.1f))); // 14
+  pts.push_back(
+      cv::Point3f(cx + s * (1.8f), cy + s * (-1.6f), cz + s * (0.1f))); // 15
+
+  // Legs: 16..19
+  pts.push_back(
+      cv::Point3f(cx + s * (-0.8f), cy + s * (-2.2f), cz + s * (0.1f))); // 16
+  pts.push_back(
+      cv::Point3f(cx + s * (-0.8f), cy + s * (-3.3f), cz + s * (0.1f))); // 17
+  pts.push_back(
+      cv::Point3f(cx + s * (0.8f), cy + s * (-2.2f), cz + s * (0.1f))); // 18
+  pts.push_back(
+      cv::Point3f(cx + s * (0.8f), cy + s * (-3.3f), cz + s * (0.1f))); // 19
+
+  // Eye patches: 20..23
+  pts.push_back(
+      cv::Point3f(cx + s * (-0.55f), cy + s * (1.10f), cz + s * (0.12f))); // 20
+  pts.push_back(
+      cv::Point3f(cx + s * (-0.20f), cy + s * (0.75f), cz + s * (0.12f))); // 21
+  pts.push_back(
+      cv::Point3f(cx + s * (0.20f), cy + s * (0.75f), cz + s * (0.12f))); // 22
+  pts.push_back(
+      cv::Point3f(cx + s * (0.55f), cy + s * (1.10f), cz + s * (0.12f))); // 23
+
+  // Nose / mouth: 24..27
+  pts.push_back(
+      cv::Point3f(cx + s * (0.00f), cy + s * (0.55f), cz + s * (0.18f))); // 24
+  pts.push_back(
+      cv::Point3f(cx + s * (-0.18f), cy + s * (0.30f), cz + s * (0.18f))); // 25
+  pts.push_back(
+      cv::Point3f(cx + s * (0.18f), cy + s * (0.30f), cz + s * (0.18f))); // 26
+  pts.push_back(
+      cv::Point3f(cx + s * (0.00f), cy + s * (0.05f), cz + s * (0.18f))); // 27
+
+  return pts;
+}
+
+/**
+ * makePandaEdges
+ * Defines line segments between panda vertices.
+ */
+static std::vector<std::pair<int, int>> makePandaEdges() {
+  return {// head
+          {0, 1},
+          {1, 2},
+          {2, 3},
+          {3, 0},
+
+          // ears
+          {0, 4},
+          {4, 5},
+          {5, 0},
+          {1, 7},
+          {7, 6},
+          {6, 1},
+
+          // body
+          {8, 9},
+          {9, 10},
+          {10, 11},
+          {11, 8},
+
+          // neck/body connection
+          {3, 8},
+          {2, 9},
+
+          // arms
+          {8, 12},
+          {12, 13},
+          {13, 11},
+          {9, 14},
+          {14, 15},
+          {15, 10},
+
+          // legs
+          {11, 16},
+          {16, 17},
+          {10, 18},
+          {18, 19},
+
+          // eye patches
+          {20, 21},
+          {22, 23},
+
+          // nose/mouth
+          {21, 24},
+          {24, 22},
+          {24, 25},
+          {24, 26},
+          {25, 27},
+          {26, 27}};
+}
+
+std::vector<cv::Point3f> makePoints(ObjectType type) {
+  switch (type) {
+  case ObjectType::BANANA:
+    return makeBananaPoints(); // your existing function
+  case ObjectType::PANDA:
+    return makePandaPoints();
+  default:
+    return {};
+  }
+}
+
+std::vector<std::pair<int, int>> makeEdges(ObjectType type) {
+  switch (type) {
+  case ObjectType::BANANA:
+    return makeBananaEdges();
+  case ObjectType::PANDA:
+    return makePandaEdges();
+  default:
+    return {};
+  }
+}
+
 int projectObject(const std::vector<cv::Point3f> &objectPoints,
                   const cv::Mat &rvec, const cv::Mat &tvec,
                   const cv::Mat &cameraMatrix, const cv::Mat &distCoeffs,
@@ -116,7 +279,8 @@ int projectObject(const std::vector<cv::Point3f> &objectPoints,
   return 0;
 }
 
-int drawObject(cv::Mat &frame, const std::vector<cv::Point2f> &imagePoints,
+int drawObject(cv::Mat &frame, ObjectType type,
+               const std::vector<cv::Point2f> &imagePoints,
                const std::vector<std::pair<int, int>> &edges) {
   if (imagePoints.empty()) {
     std::cerr << "Error: imagePoints is empty\n";
@@ -137,15 +301,28 @@ int drawObject(cv::Mat &frame, const std::vector<cv::Point2f> &imagePoints,
     cv::Point p2((int)imagePoints[b].x, (int)imagePoints[b].y);
 
     cv::Scalar color;
-    if (i < 24) {
-      color = cv::Scalar(255, 255, 0); // cyan slice diamonds
-    } else if (i < 44) {
-      color = cv::Scalar(0, 255, 255); // yellow longitudinal rails
+
+    if (type == ObjectType::BANANA) {
+      if (i < 24) {
+        color = cv::Scalar(255, 255, 0); // cyan slice diamonds
+      } else if (i < 44) {
+        color = cv::Scalar(0, 255, 255); // yellow rails
+      } else {
+        color = cv::Scalar(30, 60, 120); // stem/tip
+      }
+    } else if (type == ObjectType::PANDA) {
+      if (i < 10) {
+        color = cv::Scalar(255, 255, 255); // white head/ears
+      } else if (i < 28) {
+        color = cv::Scalar(180, 180, 180); // gray body/limbs
+      } else {
+        color = cv::Scalar(0, 0, 0); // black face details
+      }
     } else {
-      color = cv::Scalar(30, 60, 120); // brown-ish stem/tip
+      color = cv::Scalar(0, 255, 0);
     }
 
-    cv::line(frame, p1, p2, color, 2);
+    cv::line(frame, p1, p2, color, 2, cv::LINE_AA);
   }
 
   return 0;

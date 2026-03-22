@@ -44,8 +44,10 @@ int main() {
   cv::Size patternSize(9, 6);
   std::vector<cv::Vec3f> point_set = buildPointSet(patternSize);
 
-  std::vector<cv::Point3f> bananaPoints = makeBananaPoints();
-  std::vector<std::pair<int, int>> bananaEdges = makeBananaEdges();
+  ObjectType currentObject = ObjectType::BANANA;
+
+  auto objectPoints = makePoints(currentObject);
+  auto objectEdges = makeEdges(currentObject);
 
   std::vector<cv::Point3f> solidPoints = makeSolidHousePoints();
   std::vector<std::vector<int>> solidFaces = makeSolidHouseFaces();
@@ -88,10 +90,10 @@ int main() {
         }
 
         if (showObject) {
-          rc = projectObject(bananaPoints, rvec, tvec, cameraMatrix, distCoeffs,
+          rc = projectObject(objectPoints, rvec, tvec, cameraMatrix, distCoeffs,
                              objectImagePoints);
           if (rc == 0) {
-            drawObject(frame, objectImagePoints, bananaEdges);
+            drawObject(frame, currentObject, objectImagePoints, objectEdges);
           }
         }
 

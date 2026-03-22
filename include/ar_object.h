@@ -2,7 +2,7 @@
  * ar_object.h
  * Name: Jaden Zhou
  * Date: Mar 2026
- * Purpose: Virtual 3D banana object definitions and drawing utilities.
+ * Purpose: Virtual 3D object definitions and drawing utilities.
  */
 
 #ifndef AR_OBJECT_H
@@ -13,22 +13,34 @@
 #include <vector>
 
 /**
- * makeBananaPoints
- * Builds a floating wireframe banana in board coordinates.
+ * ObjectType
+ * Enum representing available wireframe objects.
+ */
+enum class ObjectType { BANANA, PANDA };
+
+/**
+ * makePoints
+ * Builds a floating wireframe object in board coordinates.
+ *
+ * Arguments:
+ * - type: object type
  *
  * Returns:
  * - vector of 3D points
  */
-std::vector<cv::Point3f> makeBananaPoints();
+std::vector<cv::Point3f> makePoints(ObjectType type);
 
 /**
- * makeBananaEdges
- * Builds edge list for the wireframe banana.
+ * makeEdges
+ * Builds edge list for the wireframe object.
+ *
+ * Arguments:
+ * - type: object type
  *
  * Returns:
  * - vector of vertex index pairs
  */
-std::vector<std::pair<int, int>> makeBananaEdges();
+std::vector<std::pair<int, int>> makeEdges(ObjectType type);
 
 /**
  * projectObject
@@ -62,7 +74,8 @@ int projectObject(const std::vector<cv::Point3f> &objectPoints,
  * Returns:
  * - 0 on success, non-zero on error
  */
-int drawObject(cv::Mat &frame, const std::vector<cv::Point2f> &imagePoints,
+int drawObject(cv::Mat &frame, ObjectType type,
+               const std::vector<cv::Point2f> &imagePoints,
                const std::vector<std::pair<int, int>> &edges);
 
 #endif
