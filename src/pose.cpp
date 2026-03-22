@@ -80,7 +80,7 @@ int main() {
         printPose(rvec, tvec);
 
         if (showAxes) {
-          rc = projectAxes(3.0f, rvec, tvec, cameraMatrix, distCoeffs,
+          rc = projectAxes(10.0f, rvec, tvec, cameraMatrix, distCoeffs,
                            axisImagePoints);
           if (rc == 0) {
             drawAxes(frame, axisImagePoints);
